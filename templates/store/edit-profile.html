@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    Edit Profile
+{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <h5 class="card-header">Edit Profile</h5>
+        <form class="card-body" method="POST">
+            {% csrf_token %} 
+            <div class="row mb-3">
+                <div class="col-12">
+                    <label for="task-name"><h5>Email</h5></label>
+                    {{ form.email }}
+                </div>
+            </div>
+            <a href="{% url 'profile' %}" class="btn btn-info text-white">&#x2190; Goback</a>
+            <input type="submit" class="btn btn-primary" value="Edit">
+        </form>
+    </div>
+{% endblock %}
+

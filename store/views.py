@@ -5,6 +5,7 @@ import json
 import datetime
 
 from .models import *
+from .forms import EditProfileForm, AddProductForm
 from . utils import cookieCart, cartData, guestOrder
 
 # Create your views here.
@@ -32,9 +33,62 @@ def checkout(request):
     cartItems = data['cartItems']
     items = data['items']
     order = data['order']
+
+    customer = {}
+    if request.user.is_authenticated:
+        customer = request.user.customer
         
-    context = {'items':items, 'order':order, 'cartItems': cartItems}
+    context = {'items':items, 'order':order, 'cartItems': cartItems, 'customer':customer}
     return render(request, 'store/checkout.html', context)
+
+def history(request):
+    customer = request.user.customer
+
+    # items in cart
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
+    cartItems = order.get_cart_items
+
+    # list of purchased orders
+    orders = Order.objects.filter(customer=customer, complete=True)
+    orderList = []
+    for order in orders:
+        object = {
+            'order': order,
+            'items': order.orderitem_set.all(),
+        }
+        orderList.append(object)
+
+    context = {'orderList':orderList, 'cartItems': cartItems}
+
+    return render(request, 'store/history.html', context)
+
+def profile(request):
+    customer = request.user.customer
+
+    # items in cart
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
+    cartItems = order.get_cart_items
+
+    context = { 'customer':customer, 'cartItems': cartItems }
+    return render(request, 'store/profile.html', context)
+
+def editProfile(request):
+    customer = request.user.customer
+
+    # items in cart
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
+    cartItems = order.get_cart_items
+ 
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            return redirect('/profile')
+    else:
+        form = EditProfileForm(instance=customer)
+
+    context = { 'customer':customer, 'cartItems': cartItems, 'form': form }
+    return render(request, 'store/edit-profile.html', context)
 
 def updateItem(request):
     data = json.loads(request.body)
@@ -97,3 +151,20 @@ def processOrder(request):
         )
 
     return JsonResponse("Payment complete!", safe=False)
+
+def addProduct(request):
+    # items in cart
+    customer = request.user.customer
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
+    cartItems = order.get_cart_items
+
+    if request.method == 'POST':
+        form = AddProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+        return redirect('/')
+    else:
+        form = AddProductForm()
+
+    context = { 'cartItems': cartItems, 'form': form }
+    return render(request, 'store/add-product.html', context)

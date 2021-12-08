@@ -12,18 +12,20 @@
                 <div class="card-body">
                     <h1 >Login</h1>
                     <form action="{% url 'login' %}" method="post" novalidate>
-                        {{ form|crispy }}
                         {% csrf_token %}
+                        {{ form|crispy }}
 
                         <div class="d-grid gap-2 my-3 ">
                             {% comment %}
-                            for more informarition, visit: https://getbootstrap.com/docs/5.1/components/buttons/#block-buttons
+                            more info visit: https://getbootstrap.com/docs/5.1/components/buttons/#block-buttons
                             {% endcomment %}
                             <button class="btn btn-primary btn-lg" type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
                             <hr>
                             <a href="{% url 'register' %}" class="btn btn-success btn-lg"><i class="fas fa-plus"></i> Create a new account</a>
                         </div>
+
                     </form>
+
 
                 </div>
             </div>

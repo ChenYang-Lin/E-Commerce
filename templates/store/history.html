@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    Purchase History
+{% endblock %}
+
+{% block body %}
+    <h3 class="secondary">Purchase History</h3>
+    {% for order in orderList %}
+        <div class="row card my-3">
+            <div class="card-header">
+                <strong>Orderd At: </strong>{{order.order.date_ordered}}
+            </div>
+            <div class="row">
+                <div class="col-2"></div>
+                <div class="col-4 fw-bold">Item</div>
+                <div class="col-2 fw-bold">Price</div>
+                <div class="col-2 fw-bold ps-0">Quantity</div>
+                <div class="col-2 fw-bold">Total</div>
+            </div>
+            {% for item in order.items %}
+                <div class="row">
+                    <div class="col-2 my-3"><img class="checkout-img" src="{{item.product.imageURL}}" alt="image"></div>
+                    <div class="col-4 my-3 my-auto">{{item.product.name}}</div>
+                    <div class="col-2 my-3 my-auto">${{item.product.price|floatformat:2}}</div>
+                    <div class="col-2 my-3 my-auto">
+                        <div class="d-flex">
+                            <p class="my-auto">{{item.quantity}}</p>
+                        </div>
+                    </div>
+                    <div class="col-2 my-3 my-auto">${{item.get_total|floatformat:2}}</div>
+                </div>
+            {% endfor %}  
+            <p class="text-end me-5">Total: <strong>${{order.order.get_cart_total|floatformat:2}}</strong></p>
+        </div>
+    {% endfor %}
+{% endblock %}
+

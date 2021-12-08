@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from store.models import Customer
+from .forms import UserRegistrationForm
 
 
 def register_view(request):
@@ -11,7 +12,7 @@ def register_view(request):
     # We use Django's UserCreationForm which is a model created by Django to create a new user.
     # UserCreationForm has three fields by default: username (from the user model), password1, and password2.
     # If you want to include email as well, switch to our own custom form called UserRegistrationForm
-    form = UserCreationForm(request.POST or None)
+    form = UserRegistrationForm(request.POST or None)
     if request.method == 'POST':
         # check whether it's valid: for example it verifies that password1 and password2 match
         if form.is_valid():
@@ -22,6 +23,7 @@ def register_view(request):
             Customer.objects.create(
                 user=user,
                 name=form.cleaned_data.get('username'),
+                email=form.cleaned_data.get('email'),
             )
             return redirect('index')
             # if you do want to login the user directly after registration, comment out the three lines above,
