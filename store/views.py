@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import json
@@ -41,6 +42,7 @@ def checkout(request):
     context = {'items':items, 'order':order, 'cartItems': cartItems, 'customer':customer}
     return render(request, 'store/checkout.html', context)
 
+@login_required(login_url='login')
 def history(request):
     customer = request.user.customer
 
@@ -62,6 +64,7 @@ def history(request):
 
     return render(request, 'store/history.html', context)
 
+@login_required(login_url='login')
 def profile(request):
     customer = request.user.customer
 
@@ -72,6 +75,7 @@ def profile(request):
     context = { 'customer':customer, 'cartItems': cartItems }
     return render(request, 'store/profile.html', context)
 
+@login_required(login_url='login')
 def editProfile(request):
     customer = request.user.customer
 
@@ -152,7 +156,12 @@ def processOrder(request):
 
     return JsonResponse("Payment complete!", safe=False)
 
+@login_required(login_url='login')
 def addProduct(request):
+    # if not admin/superuser, redirect to home page
+    if not request.user.is_superuser:
+        return redirect('/')
+
     # items in cart
     customer = request.user.customer
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
